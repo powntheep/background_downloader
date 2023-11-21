@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+// import 'dart:html' as html;
+// import 'package:web/web.dart';
 
 import 'utils_impl.dart';
 
@@ -20,52 +21,7 @@ class Utils implements UtilsImpl {
   Future<Map<String, dynamic>?> get(String path,
       [bool? isCollection = false, List<List>? conditions]) async {
     // Fetch the documents for this collection
-    if (isCollection != null && isCollection == true) {
-      var dataCol = html.window.localStorage.entries.singleWhere(
-        (e) => e.key == path,
-        orElse: () => const MapEntry('', ''),
-      );
-      if (dataCol.key != '') {
-        if (conditions != null && conditions.first.isNotEmpty) {
-          return _getAll(dataCol);
-          /*
-          final ck = conditions.first[0] as String;
-          final co = conditions.first[1];
-          final cv = conditions.first[2];
-          // With conditions
-          try {
-            final mapCol = json.decode(dataCol.value) as Map<String, dynamic>;
-            final its = SplayTreeMap.of(mapCol);
-            its.removeWhere((key, value) {
-              if (value is Map<String, dynamic>) {
-                final key = value.keys.contains(ck);
-                final check = value[ck] as bool;
-                return !(key == true && check == cv);
-              }
-              return false;
-            });
-            its.forEach((key, value) {
-              final data = value as Map<String, dynamic>;
-              _data[key] = data;
-            });
-            return _data;
-          } catch (error) {
-            throw error;
-          }
-          */
-        } else {
-          return _getAll(dataCol);
-        }
-      }
-    } else {
-      final data = await _readFromStorage(path);
-      final id = path.substring(path.lastIndexOf('/') + 1, path.length);
-      if (data is Map<String, dynamic>) {
-        if (data.containsKey(id)) return data[id];
-        return null;
-      }
-    }
-    return null;
+    throw UnimplementedError();
   }
 
   @override
@@ -106,118 +62,23 @@ class Utils implements UtilsImpl {
 
   void _initStream(
       StreamController<Map<String, dynamic>> storage, String path) {
-    var dataCol = html.window.localStorage.entries.singleWhere(
-      (e) => e.key == path,
-      orElse: () => const MapEntry('', ''),
-    );
-    try {
-      if (dataCol.key != '') {
-        final mapCol = json.decode(dataCol.value) as Map<String, dynamic>;
-        mapCol.forEach((key, value) {
-          final data = value as Map<String, dynamic>;
-          storage.add(data);
-        });
-      }
-    } catch (error) {
-      rethrow;
-    }
+    throw UnimplementedError();
   }
 
   final _storageCache = <String, StreamController<Map<String, dynamic>>>{};
 
   Future<dynamic> _readFromStorage(String path) async {
-    final key = path.replaceAll(RegExp(r'[^\/]+\/?$'), '');
-    final data = html.window.localStorage.entries.firstWhere(
-      (i) => i.key == key,
-      orElse: () => const MapEntry('', ''),
-    );
-    if (data != const MapEntry('', '')) {
-      try {
-        return json.decode(data.value) as Map<String, dynamic>;
-      } catch (e) {
-        return e;
-      }
-    }
+    throw UnimplementedError();
   }
 
   Future<dynamic> _writeToStorage(
     Map<String, dynamic> data,
     String path,
   ) async {
-    final key = path.replaceAll(RegExp(r'[^\/]+\/?$'), '');
-
-    final uri = Uri.parse(path);
-    final id = uri.pathSegments.last;
-    var dataCol = html.window.localStorage.entries.singleWhere(
-      (e) => e.key == key,
-      orElse: () => const MapEntry('', ''),
-    );
-    try {
-      if (dataCol.key != '') {
-        final mapCol = json.decode(dataCol.value) as Map<String, dynamic>;
-        mapCol[id] = data;
-        dataCol = MapEntry(id, json.encode(mapCol));
-        html.window.localStorage.update(
-          key,
-          (value) => dataCol.value,
-          ifAbsent: () => dataCol.value,
-        );
-      } else {
-        html.window.localStorage.update(
-          key,
-          (value) => json.encode({id: data}),
-          ifAbsent: () => json.encode({id: data}),
-        );
-      }
-      // ignore: close_sinks
-      final storage = _storageCache[key] ??
-          _storageCache.putIfAbsent(
-              key, () => StreamController<Map<String, dynamic>>.broadcast());
-
-      storage.sink.add(data);
-    } catch (error) {
-      rethrow;
-    }
+    throw UnimplementedError();
   }
 
   Future<dynamic> _deleteFromStorage(String path) async {
-    if (path.endsWith('/')) {
-      // If path is a directory path
-      final dataCol = html.window.localStorage.entries.singleWhere(
-        (element) => element.key == path,
-        orElse: () => const MapEntry('', ''),
-      );
-
-      try {
-        if (dataCol.key != '') {
-          html.window.localStorage.remove(dataCol.key);
-        }
-      } catch (error) {
-        rethrow;
-      }
-    } else {
-      // If path is a file path
-      final uri = Uri.parse(path);
-      final key = path.replaceAll(RegExp(r'[^\/]+\/?$'), '');
-      final id = uri.pathSegments.last;
-      var dataCol = html.window.localStorage.entries.singleWhere(
-        (e) => e.key == key,
-        orElse: () => const MapEntry('', ''),
-      );
-
-      try {
-        if (dataCol.key != '') {
-          final mapCol = json.decode(dataCol.value) as Map<String, dynamic>;
-          mapCol.remove(id);
-          html.window.localStorage.update(
-            key,
-            (value) => json.encode(mapCol),
-            ifAbsent: () => dataCol.value,
-          );
-        }
-      } catch (error) {
-        rethrow;
-      }
-    }
+    throw UnimplementedError();
   }
 }
